@@ -1,0 +1,91 @@
+<html>
+	<head>
+		<title>Test JSON-RPC</title>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+        <script type="text/javascript" src="jsonTools.js"></script>
+		 <script type="text/javascript">
+		 		 	
+		 	function doRPC(evt) {
+		 		evt.preventDefault();
+				
+				var url = $(evt.target).find("[name=controller]").val();
+				var method = "" + $(evt.target).find("[name=method]").val();
+				var jsonParams = [url, method];
+				
+				/*	Push the optional parameters onto the request params array.  */
+				$(evt.target).find("[name=param]").each(function() {
+					var param = $(this).val();
+					if (param != undefined && param != "")
+						jsonParams.push(param);
+				});
+				
+				var jsonVal = $(evt.target).find("[name=jsonParam]").val();
+				if (jsonVal != undefined && jsonVal != "") {
+					jsonVal = JSON.parse(jsonVal);
+					jsonParams.push(jsonVal);
+				}
+				
+				var ajrq = $.jsonRPC.apply({},jsonParams);
+		 		$("#requestInfo").html("URL: " + url + "<br/>--&gt;" + JSON.stringify(ajrq.jsonRequestObject));
+		 		$("#responseInfo").html("<blink><em>sending....</em></blink>");
+				
+				ajrq.done(function(data, status, jqxhr) {
+					// on success, response is an object.  So we have to stringify it
+					$("#responseInfo").html("&lt;--"+jqxhr.responseText);
+					console.log(data);
+				})
+				.fail(function(jqxhr, message, exObj) {
+					$("#responseInfo").empty();
+					if (exObj instanceof JSONRPCError)
+						alert("JSON error (" + exObj + ")");
+					else	
+						alert("Call failed ("+exObj+")");
+					console.log(exObj);
+				});
+		 							
+		 	}
+		 	
+			 $(document).ready(function() {
+				$("#jsonForm").submit(doRPC);
+			 });
+		</script>
+	</head>
+	<body>
+		<p>This is an exploratory/debugging tool for testing JSON methods.</p>
+
+		<p>By default, all of these controllers supply an inherited "hello" method.  So sending a
+		valid JSON-RPC 2.0 request to "/hello.php" with a method name of "hello" will always return 
+		a valid JSON response.</p>
+
+		<p>To get started, just click on the submit button without changing anything.  You'll see the
+		request and response objects printed below the form.</p>
+		
+		<form id="jsonForm">
+			Controller<br/>
+			<input type="text" name="controller" value="hello.php"/><p/>
+			
+			Method<br/>
+			<input type="text" name="method" value="hello"/><p/>
+			
+			Parameters (optional)<br/>
+			<input type="text" name="param" value=""/>
+			<input type="text" name="param" value=""/>
+			<input type="text" name="param" value=""/>
+			<input type="text" name="param" value=""/>
+			<input type="text" name="param" value=""/><p/>
+			
+			Or enter a JSON parameter to send<br/>
+			<textarea name="jsonParam" rows=10 cols=65></textarea><p/>
+			
+			<input type="submit" value="Send"><p/>
+		</form>
+		<div id="result">
+			<div id="requestInfo">
+				&nbsp;
+			</div>
+			<div id="responseInfo">
+				&nbsp;
+			</div>
+		</div>
+	</body>
+</html>
