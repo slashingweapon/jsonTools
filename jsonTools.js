@@ -1,3 +1,9 @@
+/**
+ *	JSON-RPC Tool
+ *	c. 2012 CJ Holmes - Free for all use provided attribution is given.
+ *	https://github.com/slashingweapon/jsonTools
+ */
+
 function JSONRPCError(obj) {
 	jQuery.extend(this, obj);
 	this.toString = function() { return this.message; }
@@ -18,7 +24,7 @@ function JSONRPCError(obj) {
 		 *	For example, you can do this:
 		 *	var jqx = jsonRPC('/words/json', 'someMethod', 'param1', 'param2', 'param3')
 		 *		.done(function(data) {
-		 *			console.log(data.result);
+		 *			console.log(data);
 		 *		});
 		 *
 		 *	For convenience/debugging, we set jqx.jsonRequestObject to be the un-serialized 
